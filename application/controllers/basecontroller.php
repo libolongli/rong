@@ -7,8 +7,6 @@ class BaseController extends CI_Controller {
 		parent::__construct();
 		
 	}
-	
-
 
 	/**
 	 * [checklogin 检查是否已经登录]
@@ -16,20 +14,9 @@ class BaseController extends CI_Controller {
 	 */
 	public function checklogin(){
 		
-		if(BACKSTAGE){
-			$this->load->model('admins');
-			return $this->admins->isLogin();
-		}else{
-			$this->load->model('users');
-			return $this->users->isLogin();
-		}
+		
 	}
 
-    
-	
-	
-	
-	
 
 	/*包装前台需要返回的数据
 	 * {Success: false, Code: "0.2", Message: "密码错误，您还可以输入4次！", Result: [{TotalErrorCount: 4, LockMinute: 0}]}

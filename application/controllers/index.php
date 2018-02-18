@@ -1,26 +1,54 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Index extends CI_Controller {
+class Index extends Basecontroller {
 
 	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/user_guide/general/urls.html
+	 * [qrcode description]
+	 * @return [type] [description]
 	 */
-	public function index()
-	{
-		echo 1111;exit;
-		//$this->load->view('welcome_message');
+	public function qrcode(){
+		echo __FUNCTION__;
 	}
+
+	/**
+	 * [get_member_token member_id]
+	 * mid 
+	 * .....
+	 * @return [type] [description]
+	 */
+	public function get_member_token(){
+		
+		$data = $this->getApiParams();
+		$db_data = array('member_id'=>$data['memberid']);
+		$this->load->model('member_m');
+		$this->member_m->replace($db_data);
+		
+		$redis_key = md5($data['memberid']);
+		$this->wredis->setex($redis_key,600,$data['memberid']);
+
+		$this->teamapi(array('status'=>true,'code'=>0,'result'=>array('token'=>$redis_key)));
+	}
+
+	/**
+	 * [fastlogin description]
+	 * @return [type] [description]
+	 */
+	public function fastlogin(){
+		$token = $this->input->get('token');
+		$member_id = $this->input->get('mid');
+
+		if($this->wredis->get($token) == $member_id){
+			$this->wredis->del($token);
+			$this->load->model('member_m');
+			$this->member_m->login(array('member_id'=>$member_id));
+			header("Location: /member/dashboard");
+		}else{
+			$this->teamapi(array('status'=>false,'code'=>1,'msg'=>'token is illegal！'));
+		}
+		
+	}
+
+
 }
+

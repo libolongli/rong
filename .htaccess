@@ -1,0 +1,5 @@
+   RewriteEngine on
+   RewriteCond %{REQUEST_FILENAME} !-f
+   RewriteCond $1 !^(index.php|static|robots.txt)
+   RewriteCond %{REQUEST_URI} !^.*(.css|.js|.gif|.png|.jpg|.jpeg)$
+   RewriteRule ^(.*)$ /index.php/$1 [L]

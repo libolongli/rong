@@ -20,11 +20,7 @@ class Welcome extends Basecontroller {
 	 */
 	public function index()
 	{
-		$this->load->model('voucher');
-		$ret = $this->voucher->selectAll();
-		print_r($ret);exit;
-
-		//echo $this->db->insert('voucher',array('voucher_id'=>110,'transaction_id'=>110));
-		// exit;
+		echo 'welcome!';
+		exit;
 	}
 }
