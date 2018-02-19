@@ -19,13 +19,28 @@ class Index extends Basecontroller {
 	 */
 	public function get_member_token(){
 		
-		$data = $this->getApiParams();
-		$db_data = array('member_id'=>$data['memberid']);
+		$detail = $this->getApiParams();
+				//insert into db
+		$db_data = array(
+				'member_id'=>intval($detail['memberid']),
+				'name'=>$detail['name'],
+				'gender'=>$detail['gender'],
+				'address1'=>$detail['address'],
+				'zipcode'=>$detail['postcode'],
+				'city'=>$detail['city'],
+				'state'=>$detail['state'],
+				'country'=>$detail['country'],
+				'phone'=>$detail['mobiletel'],
+				'email'=>$detail['email'],
+				'ismerchant'=>$detail['ismerchant']
+
+			);
+
 		$this->load->model('member_m');
 		$this->member_m->replace($db_data);
 		
 		$redis_key = md5($data['memberid']);
-		$this->wredis->setex($redis_key,600,$data['memberid']);
+		$this->wredis->setex($redis_key,60,$data['memberid']);
 
 		$this->teamapi(array('status'=>true,'code'=>0,'result'=>array('token'=>$redis_key)));
 	}
