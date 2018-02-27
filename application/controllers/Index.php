@@ -39,8 +39,8 @@ class Index extends Basecontroller {
 		$this->load->model('member_m');
 		$this->member_m->replace($db_data);
 		
-		$redis_key = md5($data['memberid']);
-		$this->wredis->setex($redis_key,60,$data['memberid']);
+		$redis_key = md5($db_data['member_id']);
+		$this->wredis->setex($redis_key,60,$db_data['member_id']);
 
 		$this->teamapi(array('status'=>true,'code'=>0,'result'=>array('token'=>$redis_key)));
 	}
