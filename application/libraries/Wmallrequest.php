@@ -48,5 +48,42 @@ class Wmallrequest{
 
 		return json_decode($response,TRUE);
 	}
+
+
+	/**
+	 * [login login]
+	 * @param  [type] $json [description]
+	 * @return [type]       [description]
+	 */
+	public function login($json = false){
 	
+		return $this->request('http://rebate.winmall.asia/cart_api/login/',$json);
+	
+	}
+
+	/**
+	 * [get_merchant_info description]
+	 * @param  boolean $json [description]
+	 * @return [type]        [description]
+	 */
+	public function get_merchant_info($json = false){
+	
+		return $this->request('http://rebate.winmall.asia/cart_api/get_merchant_info/',$json);
+	
+	}
+
+
+	public function get_spoint($json = false){
+		
+		return $this->request('http://rebate.winmall.asia/cart_api/get_spoint/',$json);
+	
+	}
+
+	public function add_spoint_trans($json = false){
+	
+		return $this->request('http://rebate.winmall.asia/cart_api/add_spoint_trans/',$json);
+
+	}
+
+
 }

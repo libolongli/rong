@@ -8,76 +8,90 @@ class Merchant extends Basecontroller {
 		$this->load->library('Wmallrequest');
 	}
 
-	/**
-	 *  login api
-	 *  username/email
-	 *  password 
-	 */
-	public function login(){
-		$data = $this->getApiParams();
-		print_r($data);exit;
-	}
-
-	/**
-	 * [notifiction]
-	 * @return [type] [description]
-	 */
-	public function notifiction(){
-
-	}
-
-
-	/**
-	 * [voucher description]
-	 * @return [type] [description]
-	 */
-	public function voucher(){
-
-	}
-
-	/**
-	 * [transaction description]
-	 * @return [type] [description]
-	 */
-	public function transaction(){
-
-	}
-
-	/**
-	 * [check_point description]
-	 * @return [type] [description]
-	 */
-	public function check_point(){
-		
-	}
-
-	public function deposit_point(){
-
-	}
-
+	
 	/**
 	 * [confirm_transaction paied /unpaied]
 	 * @return [type] [description]
 	 */
 	public function confirm_transaction(){
 
+		//update order status
+		$data = $this->getApiParams();
+		$transactionid = $data['transaction_id'];
+		$this->load->model('transaction_m');
+		$this->load->model('notification_m');
+		$this->load->model('member_m');
+		$trans = $this->transaction_m->selectByCons(array('transaction_id'=>$transactionid));
+		if($trans['status'] == 1){
+			$result = array('status'=>false,'msg'=>'already confirmed','code'=>'009');
+			$this->teamapi($result);			
+		}
+
+		$this->transaction_m->trans_begin();
+		// $this->transaction_m->trans_commit();
+		// $this->transaction_m->trans_rollback();
+		$this->transaction_m->update(array('transaction_id'=>$transactionid),array('status'=>1));
+		//request rbs to add point
+		$order_id = date('YmdHis'). $trans['member_id'];
+		$request = array(
+					'mbid'=>$trans['member_id'],
+					'transactionid'=>$order_id,
+					// 'merchantid'=>'0604148724',
+					'merchantid'=>$trans['merchant_id'],
+					'spoint'=>$trans['total'],
+					'remark'=>$transactionid,
+					'idtype'=>'mbid'
+				);
+		
+		$response = $this->wmallrequest->add_spoint_trans(json_encode($request));
+
+		if($response['add_spoint_trans']['0']){
+			$result = array(
+						'status'=>true,
+						'msg'=>'success',
+						'code'=>0,
+				);
+			$merchant_info = $this->member_m->selectByCons(array('mbid'=>$trans['merchant_id']));
+			$notification_data = array(
+				'title'=>'already paid',
+				'content'=>$merchant_info['name'].' confirmed your pay, RM'.$trans['total'],
+				'mbid'=>$trans['member_id'],
+				'create_timestamp'=>date('Y-m-d H:i:s'),
+				'transaction_id'=>$transactionid
+			);
+
+			$this->notification_m->insert($notification_data);
+			$this->transaction_m->trans_commit();
+		}else{
+			$result = array(
+						'status'=>false,
+						'msg'=>$response['Message'],
+						'code'=>$response['Code'],
+				);
+			$this->transaction_m->trans_rollback();
+		}
+
+
+		$this->teamapi($result);
+
 	}
 
 	public function get_merchantinfo(){
+		
 		$data = $this->getApiParams();
 		$mbid = $data['mbid'];
 		$request = array(
 					'mbid'=>$mbid,
 					'idtype'=>'mbid'
 				);
-		$response = $this->wmallrequest->request('http://rebate.winmall.asia/cart_api/get_merchant_info/',json_encode($request));
+		$response = $this->wmallrequest->get_merchant_info(json_encode($request));
 		if($response['get_merchant_info']['0']){
 			$info = $response['get_merchant_info']['0'];
 			$result = array(
 						'status'=>true,
 						'msg'=>'success',
 						'code'=>1,
-						'result'=>array('mbid'=>$mbid,'storename'=>$info['membername'])
+						'result'=>array('merchantid'=>$mbid,'storename'=>$info['membername'])
 				);
 		}else{
 			$result = array(
@@ -88,66 +102,6 @@ class Merchant extends Basecontroller {
 		}
 		$this->teamapi($result);
 
-	}
-
-	public function get_spoint(){
-		$data = $this->getApiParams();
-		$mbid = $data['mbid'];
-		$request = array(
-					'mbid'=>$mbid,
-				);
-		$response = $this->wmallrequest->request('http://rebate.winmall.asia/cart_api/get_spoint/',json_encode($request));
-		if($response['get_spoint']['0']){
-			$info = $response['get_spoint']['0'];
-			$result = array(
-						'status'=>true,
-						'msg'=>'success',
-						'code'=>1,
-						'result'=>array('mbid'=>$mbid,'spoint'=>$info['spoint'])
-				);
-		}else{
-			$result = array(
-						'status'=>false,
-						'msg'=>'faild',
-						'code'=>0,
-				);
-		}
-		$this->teamapi($result);
-	}
-
-	public function add_spoint(){
-		$data = $this->getApiParams();
-		$mbid = $data['mbid'];
-		$spoint = $data['spoint'];
-		$remark = $data['remark'];
-		$transactionid = date('YmdHis').rand(10000,99999);
-		// {"mbid": "0604148724","transactionid": "0000001"," merchantid": "0604148724","spoint": "10","remark": "just a test","idtype": "mbid"}
-		$request = array(
-					'mbid'=>$mbid,
-					'transactionid'=>$transactionid,
-					'merchantid'=>"0604148724",
-					'spoint'=>$spoint,
-					'remark'=>$remark,
-					'idtype'=>'mbid'
-				);
-		$response = $this->wmallrequest->request('http://rebate.winmall.asia/cart_api/add_spoint_trans/',json_encode($request));
-		
-		if($response['add_spoint_trans']['0']){
-			$info = $response['add_spoint_trans']['0'];
-			$result = array(
-						'status'=>true,
-						'msg'=>'success',
-						'code'=>1,
-						'result'=>array('memberid'=>$info['memberid'],'spoint'=>$info['spoint'])
-				);
-		}else{
-			$result = array(
-						'status'=>false,
-						'msg'=>'faild',
-						'code'=>0,
-				);
-		}
-		$this->teamapi($result);
 	}
 
 
