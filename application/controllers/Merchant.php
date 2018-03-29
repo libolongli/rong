@@ -32,17 +32,16 @@ class Merchant extends Basecontroller {
 		// $this->transaction_m->trans_rollback();
 		$this->transaction_m->update(array('transaction_id'=>$transactionid),array('status'=>1));
 		//request rbs to add point
-		$order_id = date('YmdHis'). $trans['member_id'];
+		//$order_id = date('YmdHis'). $trans['member_id'];
 		$request = array(
 					'mbid'=>$trans['member_id'],
-					'transactionid'=>$order_id,
+					'transactionid'=>$trans['trans_no'],
 					// 'merchantid'=>'0604148724',
 					'merchantid'=>$trans['merchant_id'],
 					'spoint'=>$trans['total'],
 					'remark'=>$transactionid,
 					'idtype'=>'mbid'
 				);
-		
 		$response = $this->wmallrequest->add_spoint_trans(json_encode($request));
 
 		if($response['add_spoint_trans']['0']){

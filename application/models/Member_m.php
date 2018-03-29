@@ -26,7 +26,7 @@ class member_m extends Base_Model{
 
 	public function is_login(){
 		$data = $this->login_info();
-		if(isset($data['member_id'])){
+		if(isset($data['mbid'])){
 			return true;
 		}
 

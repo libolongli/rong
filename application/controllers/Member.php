@@ -115,16 +115,15 @@ class Member extends Basecontroller {
 
 		$info = $this->member_m->login_info();
 		$db_data = array(
-				'cash'=>$data['cash'],
+				'cash'=>$data['total'] - $data['e-voucher'],
 				'voucher'=>$data['e-voucher'],
-				'total'=>$data['cash'] + $data['e-voucher'],
+				'total'=>$data['total'],
 				'member_id'=>$info['mbid'],
 				'merchant_id'=>$data['merchantid'],
 				'create_timestamp'=>date('Y-m-d H:i:s'),
 				'status'=>0,
 			);
-
-		$db_data['trans_no'] = $this->transaction_m->getTradeNo($info['mbid']);
+		$db_data['trans_no'] = date('YmdHis').$info['mbid'];
 		$transaction_id = $this->transaction_m->insert($db_data);
 
 		//if used voucher shuold - voucher
