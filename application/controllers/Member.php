@@ -180,5 +180,12 @@ class Member extends Basecontroller {
 	}
 	
 
+	public function member_info(){
+		$this->load->model('member_m');
+		// $this->load->model('notification_m');
+
+		$info = $this->member_m->login_info();
+		print_r($info);
+	}
 
 }

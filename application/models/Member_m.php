@@ -16,8 +16,15 @@ class member_m extends Base_Model{
 	 */
 	public function login($db_data){
 		$id = $this->replace($db_data);
-		// $this->session->sess_destroy();
 		$this->session->set_userdata($db_data);
+		
+		//QRCode
+		$mbid = $db_data['mbid'];
+		if(!file_exists('qrcode/'.$mbid.'.png') && $db_data['ismerchant'] == 'Y'){
+			$this->load->library('Qrcode');
+			$this->qrcode->merchantcode($mbid);
+		}
+
 	}
 
 	public function login_info(){
