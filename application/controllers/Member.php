@@ -166,14 +166,14 @@ class Member extends Basecontroller {
 			$result = array(
 						'status'=>true,
 						'msg'=>'success',
-						'code'=>1,
+						'code'=>0,
 						'result'=>array('mbid'=>$mbid,'spoint'=>$info['spoint'])
 				);
 		}else{
 			$result = array(
 						'status'=>false,
 						'msg'=>'faild',
-						'code'=>0,
+						'code'=>'009',
 				);
 		}
 		$this->teamapi($result);

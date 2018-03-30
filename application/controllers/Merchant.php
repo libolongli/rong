@@ -89,14 +89,14 @@ class Merchant extends Basecontroller {
 			$result = array(
 						'status'=>true,
 						'msg'=>'success',
-						'code'=>1,
+						'code'=>0,
 						'result'=>array('merchantid'=>$mbid,'storename'=>$info['membername'])
 				);
 		}else{
 			$result = array(
 						'status'=>false,
 						'msg'=>'faild',
-						'code'=>0,
+						'code'=>'009',
 				);
 		}
 		$this->teamapi($result);
