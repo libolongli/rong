@@ -3109,8 +3109,8 @@
         }
 
         public function merchantcode($code){
-            $content = 'http://www.favoko.com/merchant/pay/'.$code;
-            $filename = "qrcode/{$code}.png";
+            $content = 'http://www.favoko.com/pay/'.$code;
+            $filename = "qrcode/qr.png";
             $this->png($content,$filename, 'L', 6 , 2);
             $logo = 'qrcode/logo.png';
             //打码
@@ -3128,7 +3128,44 @@
             imagecopyresampled($QR, $logo, $from_width, $from_width, 0, 0, $logo_qr_width,
             $logo_qr_height, $logo_width, $logo_height);
             imagepng($QR, $filename);
+
+            //生成条形码
+            $merchantNo = $code;
+            include 'bar/barcode.php';
+
+            $dst = 'qrcode/big.png';
+            $qr = 'qrcode/qr.png';
+            $bar = 'qrcode/bar.png';
+           
+            //缩放图片
+            $thumb = imagecreatetruecolor(224,72);
+            $source = imagecreatefrompng($bar);
+            list($width, $height) = getimagesize($bar);
+            imagecopyresized($thumb, $source, 0, 0, 0, 0, 224 , 72, $width, $height);
+            imagepng($thumb,$bar);
+
+            //背景
+            $dst_im = imagecreatefrompng($dst);  
+            $dst_info = getimagesize($dst);  
+            // imagesavealpha($dst_im, true);  
+            
+            //qr  
+            $qr_im = imagecreatefrompng($qr);  
+            $qr_info = getimagesize($qr);  
+
+            //bar
+            $bar_im = imagecreatefrompng($bar);  
+            $bar_info = getimagesize($bar);  
+
+            imagecopy($dst_im,$qr_im,21,95,0,0,$qr_info[0],$qr_info[1]); 
+            imagecopy($dst_im,$bar_im,8,7,0,0,$bar_info[0],$bar_info[1]); 
+
+            imagepng($dst_im, "qrcode/{$merchantNo}.png");  
+            imagedestroy($dst_im);  
+            imagedestroy($qr_im);  
+            imagedestroy($bar_im);  
         }
+
     }
     
     //##########################################################################

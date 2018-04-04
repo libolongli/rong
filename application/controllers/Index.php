@@ -64,6 +64,14 @@ class Index extends Basecontroller {
 		
 	}
 
+	public function qr(){
+		$detail = $this->getApiParams();
+		$mbid=$detail['memberid'];
+		$this->load->library('Qrcode');
+		$this->qrcode->merchantcode($mbid);	
+		$this->teamapi(array('status'=>true,'code'=>0,'result'=>array('url'=>'http://www.favoko.com/qrcode/'.$mbid.'.png')));
+	}
+
 
 }
 
