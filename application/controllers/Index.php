@@ -69,7 +69,7 @@ class Index extends Basecontroller {
 		$mbid=$detail['memberid'];
 		$this->load->library('Qrcode');
 		$this->qrcode->merchantcode($mbid);	
-		$this->teamapi(array('status'=>true,'code'=>0,'result'=>array('url'=>'http://www.favoko.com/qrcode/'.$mbid.'.png')));
+		$this->teamapi(array('status'=>true,'code'=>0,'result'=>array('url'=>'http://www.favoko.com/app/qrcode/'.$mbid.'.png')));
 	}
 
 
