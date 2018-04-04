@@ -3131,7 +3131,7 @@
 
             //生成条形码
             $merchantNo = $code;
-            include 'bar/barcode.php';
+            include 'bar7/barcode.php';
 
             $dst = 'qrcode/big.png';
             $qr = 'qrcode/qr.png';
